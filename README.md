@@ -32,3 +32,9 @@ If you don't specify an operation, the line is printed out.
 If you only specify a pattern, then it treats that as a single capture group.  It greps through lines that match the pattern and prints the section of the line that matches the pattern.  
 
 If you specify some capture groups in that pattern, it prints only those lines that match and only the capture groups, each group separated by a space.
+
+```
+grop '(?:[^:]*:){4}([^:,]*)[,:]' /etc/passwd
+```
+
+Prints the name in the GCOS field.  Note the non-capturing group is ignored.
