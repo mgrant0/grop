@@ -4,7 +4,9 @@ Evaluate a perl re &amp;&amp; print
 `grop [-hir] <regex pattern> [expression to evaluate] [file...]`
 
 -h prints a help message
+
 -i ignores case (adds /i flag to regex)
+
 -r recursively decends into directories like find
 
 This is basically a small script which does `perl -lne`.  It essentially greps through lines in files matching a regex (first arg) and evals the matching lines with the second arg.  The remaining args are file names, or if none given, reads from stdin.  Grop, as in grep + operate: grop.
