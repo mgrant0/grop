@@ -1,21 +1,22 @@
 #!/usr/bin/perl
 use File::Find;
+use Getopt::Std;
 
 sub usage() {
     print "grop [-i] <regex> [what to print]\n";
-    print "grop '(<.*?example.org>)' '\$1' /var/log/mail.log\n";
-    print "grop '(\w+):[^:]*:\d+:\d+:([^:,]*)[^:]*:' '\$2 \$1' /etc/passwd\n";
+    print "grop '(<.*?grant.org>)' '\$1' /var/log/mail.log\n";
     exit;
 }
 
-if ($ARGV[0] =~ /^-h$/) {
+getopts('irh');
+
+if ($opt_h) {
     usage();
 }
 
 my $mods="";
-if ($ARGV[0] =~ /^-i$/) {
+if ($opt_i) {
     $mods.="i";
-    shift;
 }
 
 my $re = $ARGV[0];  # '(...) (..)
@@ -23,9 +24,10 @@ shift;
 
 my $fmt;
 if (-e $ARGV[0]) {
-    # if it's a file, then there's no format, set the default format
+    # if it's a file, then there's no format, set the default format to blank
+    # and wrap the re in a capture group. we remove this capture group later if not necessary.
     $re = "($re)";
-    $fmt = '$1';
+    $fmt = '';
 } else {
     # if it's not a filename, treat it as a format and consume it
     $fmt = '"'.$ARGV[0].'"'; # '$2 $1';
@@ -37,14 +39,32 @@ if ($re eq "" ) {
 }
 
 # replace all dirs in ARGV with list of files
-my @ARGVSAVE = @ARGV;
-@ARGV=();
-find sub {
-    if (-f $File::Find::name) {
-        push @ARGV, $File::Find::name;
-    }
-}, @ARGVSAVE;
+if ($opt_r) {
+    print 'got here';
+    my @ARGVSAVE = @ARGV;
+    @ARGV=();
+    find sub {
+        if (-f $_) {
+            push @ARGV, $File::Find::name;
+        }
+    }, @ARGVSAVE;
+}
 
+my $mods="";
+if ($ARGV[0] =~ /^-i$/) {
+    $mods.="i";
+    shift;
+}
 while (<>)  {
-    /(?$mods)$re/ && print eval $fmt,"\n";
+    if ($fmt) {
+        /(?$mods)$re/ && print eval $fmt,"\n";
+    } else {
+        my @res = /(?$mods)$re/;
+        # if no $fmt was specified, we wrapped the re in parens to capture something
+        # so if there's only one result, we print that.  If multiple results, we ignore
+        # the $1 result because that means we wrapped other capture groups that the user
+        # specified.  XXX this may not work for complex patterns, supply a $fmt.
+        shift @res if (@res > 1);
+        print "@res\n";
+    }
 }
