@@ -58,6 +58,7 @@ while (<>)  {
     if ($fmt) {
         /(?$mods)$re/ && print eval $fmt,"\n";
     } else {
+        my @ARGVSAVE = @ARGV;
         my @res = /(?$mods)$re/;
         # if no $fmt was specified, we wrapped the re in parens to capture something
         # so if there's only one result, we print that.  If multiple results, we ignore
