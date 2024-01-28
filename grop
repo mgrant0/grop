@@ -4,7 +4,7 @@ use File::Find;
 sub usage() {
     print "grop [-i] <regex> [what to print]\n";
     print "grop '(<.*?example.org>)' '\$1' /var/log/mail.log\n";
-    print "grop '(\w+):[^:]*:\d+:\d+:([^:,]*)[^:]*:' '\$2 \$1' /etc/passwd";
+    print "grop '(\w+):[^:]*:\d+:\d+:([^:,]*)[^:]*:' '\$2 \$1' /etc/passwd\n";
     exit;
 }
 
