@@ -40,7 +40,6 @@ if ($re eq "" ) {
 
 # replace all dirs in ARGV with list of files
 if ($opt_r) {
-    print 'got here';
     my @ARGVSAVE = @ARGV;
     @ARGV=();
     find sub {
