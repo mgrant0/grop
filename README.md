@@ -1,7 +1,7 @@
 # grop
 Evaluate a perl re &amp;&amp; print 
 
-`grop [-hir] <regex pattern> [expression to evaluate] [file...]'
+`grop [-hir] <regex pattern> [expression to evaluate] [file...]`
 
 -h prints a help message
 -i ignores case (adds /i flag to regex)
