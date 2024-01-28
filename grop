@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+use File::Find;
+
+sub usage() {
+    print "grop [-i] <regex> [what to print]\n";
+    print "grop '(<.*?example.org>)' '\$1' /var/log/mail.log\n";
+    print "grop '(\w+):[^:]*:\d+:\d+:([^:,]*)[^:]*:' '\$2 \$1' /etc/passwd";
+    exit;
+}
+
+if ($ARGV[0] =~ /^-h$/) {
+    usage();
+}
+
+my $mods="";
+if ($ARGV[0] =~ /^-i$/) {
+    $mods.="i";
+    shift;
+}
+
+my $re = $ARGV[0];  # '(...) (..)
+shift;
+
+my $fmt;
+if (-e $ARGV[0]) {
+    # if it's a file, then there's no format, set the default format
+    $re = "($re)";
+    $fmt = '$1';
+} else {
+    # if it's not a filename, treat it as a format and consume it
+    $fmt = '"'.$ARGV[0].'"'; # '$2 $1';
+    shift;
+}
+
+if ($re eq "" ) {
+    usage();
+}
+
+# replace all dirs in ARGV with list of files
+my @ARGVSAVE = @ARGV;
+@ARGV=();
+find sub {
+    if (-f $File::Find::name) {
+        push @ARGV, $File::Find::name;
+    }
+}, @ARGVSAVE;
+
+while (<>)  {
+    /(?$mods)$re/ && print eval $fmt,"\n";
+}
